@@ -1,14 +1,12 @@
 package org.example.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity(name = "teachers")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 public class Teacher {
     @Id

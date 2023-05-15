@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.example.enums.LessonType;
 import org.example.enums.Time;
 
 @Entity(name = "lessons")
 @Getter
 @Setter
+@ToString
 @NoArgsConstructor
 @JsonIgnoreProperties(value = {"subject_id", "room_id", "teacher_id"}, allowSetters = true)
 public class Lesson {

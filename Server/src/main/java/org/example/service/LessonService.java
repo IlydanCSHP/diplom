@@ -6,6 +6,8 @@ import org.example.model.Room;
 import org.example.model.Subject;
 import org.example.model.Teacher;
 import org.example.repository.LessonRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +18,6 @@ public class LessonService {
     private final SubjectService subjectService;
     private final TeacherService teacherService;
     private final RoomService roomService;
-
 
     public LessonService(LessonRepository lessonRepository,
                          SubjectService subjectService,
@@ -65,7 +66,11 @@ public class LessonService {
     }
 
     public void update(Lesson lesson, Long id) {
-        getById(id);
+        Lesson oldLesson = getById(id);
+
+        lesson.setRoom(oldLesson.getRoom());
+        lesson.setTeacher(oldLesson.getTeacher());
+        lesson.setSubject(oldLesson.getSubject());
 
         lesson.setId(id);
         lessonRepository.save(lesson);
@@ -74,6 +79,7 @@ public class LessonService {
     public void updateTeacher(Long id, Long teacherId) {
         Lesson lesson = getById(id);
         Teacher teacher = teacherService.getById(teacherId);
+
         lesson.setTeacher(teacher);
 
         lessonRepository.save(lesson);
@@ -82,6 +88,7 @@ public class LessonService {
     public void updateRoom(Long id, Long roomId) {
         Lesson lesson = getById(id);
         Room room = roomService.getById(roomId);
+
         lesson.setRoom(room);
 
         lessonRepository.save(lesson);
@@ -90,10 +97,12 @@ public class LessonService {
     public void updateSubject(Long id, Long subjectId) {
         Lesson lesson = getById(id);
         Subject subject = subjectService.getById(subjectId);
+
         lesson.setSubject(subject);
 
         lessonRepository.save(lesson);
     }
+
     public void delete(Long id) {
         getById(id);
 
