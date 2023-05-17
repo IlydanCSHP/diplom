@@ -39,12 +39,13 @@ public class ScheduleController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping("{id}/lessons/{lessonId}")
-    public ResponseEntity<HttpStatus> addScheduleLesson(@PathVariable Long id, @PathVariable Long lessonId){
-        service.insertLesson(id, lessonId);
+    @PostMapping("/{id}/lesson")
+    public ResponseEntity<HttpStatus> addScheduleLesson(@PathVariable Long id, @RequestParam List<Long> lessonIds){
+        service.addLesson(id, lessonIds);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<HttpStatus> updateSchedule(@RequestBody Schedule schedule, @PathVariable Long id){
         service.update(schedule, id);
@@ -52,12 +53,6 @@ public class ScheduleController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PutMapping("/{id}/lessons")
-    public ResponseEntity<HttpStatus> updateScheduleLesson(@PathVariable Long id, @RequestParam Long oldId, @RequestParam Long newId){
-        service.updateLesson(id, oldId, newId);
-
-        return new ResponseEntity<>(HttpStatus.OK);
-    }
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteSchedule(@PathVariable Long id){
         service.delete(id);
@@ -65,7 +60,7 @@ public class ScheduleController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping("/{id}/lessons/{lessonId}")
+    @DeleteMapping("/{id}/lesson/{lessonId}")
     public ResponseEntity<HttpStatus> deleteScheduleLesson(@PathVariable Long id, @PathVariable Long lessonId){
         service.deleteLesson(id, lessonId);
 

@@ -1,13 +1,8 @@
 package org.example.service;
 
 import org.example.exception.ResourceNotFoundException;
-import org.example.model.Lesson;
-import org.example.model.Room;
-import org.example.model.Subject;
-import org.example.model.Teacher;
+import org.example.model.*;
 import org.example.repository.LessonRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -71,6 +66,7 @@ public class LessonService {
         lesson.setRoom(oldLesson.getRoom());
         lesson.setTeacher(oldLesson.getTeacher());
         lesson.setSubject(oldLesson.getSubject());
+        lesson.setSchedule(oldLesson.getSchedule());
 
         lesson.setId(id);
         lessonRepository.save(lesson);

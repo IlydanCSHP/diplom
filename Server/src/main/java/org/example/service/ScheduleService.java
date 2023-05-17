@@ -8,7 +8,6 @@ import org.example.repository.ScheduleRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ScheduleService {
@@ -38,41 +37,20 @@ public class ScheduleService {
         Group group = groupService.getById(groupId);
         List<Lesson> lessons = lessonService.getAllById(lessonIds);
 
+        for (int i = 0; i < lessons.size(); i++) {
+            Lesson lesson = lessons.get(i);
+            lesson.setSchedule(schedule);
+        }
+
         schedule.setGroup(group);
         schedule.setLessons(lessons);
 
         scheduleRepository.save(schedule);
     }
-
-    public void insertLesson(Long id, Long lessonId) {
-        Schedule schedule = getById(id);
-        Lesson lesson = lessonService.getById(lessonId);
-        List<Lesson> lessons = schedule.getLessons();
-
-        lessons.add(lesson);
-        schedule.setLessons(lessons);
-
-        scheduleRepository.save(schedule);
-    }
-
     public void update(Schedule schedule, Long id) {
         getById(id);
 
         schedule.setId(id);
-        scheduleRepository.save(schedule);
-    }
-
-    public void updateLesson(Long id, Long oldId, Long newId) {
-        Schedule schedule = getById(id);
-        List<Lesson> lessons = schedule.getLessons();
-        Lesson lesson = lessonService.getById(newId);
-        lessons = lessons.stream()
-                .filter(l -> !l.getId().equals(oldId))
-                .collect(Collectors.toList());
-        lessons.add(lesson);
-
-        schedule.setLessons(lessons);
-
         scheduleRepository.save(schedule);
     }
 
@@ -84,13 +62,24 @@ public class ScheduleService {
 
     public void deleteLesson(Long id, Long lessonId) {
         Schedule schedule = getById(id);
-        List<Lesson> lessons = schedule.getLessons();
+        Lesson lesson = lessonService.getById(lessonId);
+        if (lesson.getSchedule() == schedule){
+            lessonService.delete(lessonId);
+        }
+        scheduleRepository.save(schedule);
+    }
 
-        lessons = lessons.stream()
-                .filter(l -> !l.getId().equals(lessonId))
-                .collect(Collectors.toList());
+    public void addLesson(Long id, List<Long> lessonIds) {
+        Schedule schedule = getById(id);
+        List<Lesson> lessons = lessonService.getAllById(lessonIds);
 
-        schedule.setLessons(lessons);
+        for (int i = 0; i < lessons.size(); i++) {
+            Lesson lesson = lessons.get(i);
+            lesson.setSchedule(schedule);
+            lessonService.update(lesson, lesson.getId());
+            schedule.getLessons().add(lesson);
+        }
+
         scheduleRepository.save(schedule);
     }
 }

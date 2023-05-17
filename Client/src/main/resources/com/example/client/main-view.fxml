@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane
+        fx:controller="com.example.client.controller.MainController"
+        maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <MenuBar AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="Справочники">
+            <items>
+              <MenuItem fx:id="groups" mnemonicParsing="false" text="Группы" />
+                  <MenuItem fx:id="teachers" mnemonicParsing="false" text="Преподаватели" />
+                  <MenuItem fx:id="subjects" mnemonicParsing="false" text="Предметы" />
+                  <MenuItem fx:id="rooms" mnemonicParsing="false" text="Аудитории" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Помощь">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="APK">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </children>
+</AnchorPane>

@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,11 +10,15 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@JsonIgnoreProperties(value = {"schedule"}, allowSetters = true)
 public class Group {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @OneToOne(mappedBy = "group", cascade = CascadeType.ALL)
+    private Schedule schedule;
 
     @Column(name = "group_title")
     private String title;

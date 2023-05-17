@@ -1,6 +1,7 @@
 package org.example.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,21 +14,18 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@JsonIgnoreProperties(value = {"group_id", "lesson_id"})
 public class Schedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.REFRESH)
     @JoinColumn(name = "group_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Group group;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "lesson_id", referencedColumnName = "id")
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "schedule", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Lesson> lessons;
 
     @Column(name = "schedule_date")
