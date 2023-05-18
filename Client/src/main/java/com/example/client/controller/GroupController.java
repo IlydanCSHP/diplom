@@ -25,7 +25,10 @@ public class GroupController {
     TableView<Group> table;
     @FXML
     Button addButton;
-
+    @FXML
+    Button updateButton;
+    @FXML
+    Button deleteButton;
     ObservableList<Group> groups;
     FXMLLoader loader;
 
@@ -33,41 +36,107 @@ public class GroupController {
     public void initialize() {
         main.setOnAction(event -> openMain());
         addButton.setOnAction(event -> addDialog());
+        updateButton.setOnAction(event -> updateDialog());
+        deleteButton.setOnAction(event -> deleteGroup());
         setTable();
+    }
+
+    private DialogController setDialogController(FXMLLoader loader, String title, TextField... textFields) throws IOException {
+        DialogController dialogController = loader.getController();
+        dialogController.addInput(textFields);
+        dialogController.setTitle(title);
+
+        return loader.getController();
+    }
+
+    private void setDialog(Scene scene) throws IOException {
+        Stage stage = new Stage();
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setScene(scene);
+        stage.showAndWait();
     }
 
     private void addDialog() {
         loader = new FXMLLoader(Main.class.getResource("dialog-view.fxml"));
         try {
             Scene scene = new Scene(loader.load());
-            Stage stage = new Stage();
-            DialogController dialogController = loader.getController();
             TextField title = new TextField();
             TextField speciality = new TextField();
+
             title.setPromptText("Название");
             speciality.setPromptText("Специальность");
 
-            dialogController.addInput(title, speciality);
-            dialogController.setTitle("Добавление группы");
+            DialogController dialogController = setDialogController(loader, "Добавление группы", title, speciality);
+
             Button applyButton = dialogController.getApplyButton();
             applyButton.setOnAction(event -> addGroup(title, speciality));
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setScene(scene);
-            stage.showAndWait();
+
+            setDialog(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void updateDialog() {
+        loader = new FXMLLoader(Main.class.getResource("dialog-view.fxml"));
+        Group group = table.getSelectionModel().getSelectedItem();
+        try {
+            Scene scene = new Scene(loader.load());
+            TextField title = new TextField();
+            TextField speciality = new TextField();
+
+            title.setPromptText("Название");
+            title.setText(group.getTitle());
+
+            speciality.setPromptText("Специальность");
+            speciality.setText(group.getSpeciality());
+
+            DialogController dialogController = setDialogController(loader, "Обновление группы", title, speciality);
+
+            Button applyButton = dialogController.getApplyButton();
+            applyButton.setOnAction(event -> updateGroup(title, speciality, group.getId()));
+
+            setDialog(scene);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     private void addGroup(TextField title, TextField speciality) {
-        try {
-            System.out.println("TEWST");
-            Group group = new Group(title.getText(), speciality.getText());
-            RestClient.add("/groups/add", group);
-            setTable();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        new Thread(() -> {
+            try {
+                Group group = new Group(title.getText(), speciality.getText());
+                RestClient.add("/groups/add", group);
+                setTable();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+    private void updateGroup(TextField title, TextField speciality, Long id) {
+        new Thread(() -> {
+            try {
+                Group group = new Group(title.getText(), speciality.getText());
+                RestClient.update("/groups/" + id, group);
+                setTable();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
+    }
+
+    private void deleteGroup() {
+        new Thread(() -> {
+            try {
+                Group group = table.getSelectionModel().getSelectedItem();
+                RestClient.delete("/groups/" + group.getId());
+                setTable();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }).start();
     }
 
     private void setTable() {
@@ -79,6 +148,7 @@ public class GroupController {
 
                 TableColumn<Group, String> speciality = new TableColumn<>("Специальность");
                 speciality.setCellValueFactory(new PropertyValueFactory<>("speciality"));
+
 
                 table.setItems(groups);
                 table.getColumns().setAll(title, speciality);

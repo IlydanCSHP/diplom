@@ -25,6 +25,7 @@ public class MainController {
         loader.setControllerFactory(aClass -> controller);
         try {
             Scene scene = new Scene(loader.load());
+            scene.getStylesheets().add(getClass().getResource("/styles/style.css").toExternalForm());
             Stage stage = (Stage) groups.getParentPopup().getOwnerWindow();
             stage.setScene(scene);
             stage.show();

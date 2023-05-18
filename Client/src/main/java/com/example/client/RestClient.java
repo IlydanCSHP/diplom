@@ -1,6 +1,5 @@
 package com.example.client;
 
-import com.example.client.model.Group;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.HttpResponse;
@@ -8,13 +7,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 public class RestClient {
     private static final String API_URL = "http://localhost:8080/api/v1";
@@ -36,12 +35,22 @@ public class RestClient {
         String requestBody = mapper.writeValueAsString(addedClass);
 
         HttpPost request = new HttpPost(url.toString());
-        request.setEntity(new StringEntity(requestBody));
-        request.setHeader("Content-Type", "application/json");
+        request.setEntity(new StringEntity(requestBody, "UTF-8"));
+        request.setHeader("Content-Type", "application/json; charset=UTF-8");
 
         client.execute(request);
     }
 
+    public static <T> void update(String endpoint, T updatedClass) throws IOException {
+        URL url = new URL(API_URL + endpoint);
+        String requestBody = mapper.writeValueAsString(updatedClass);
+
+        HttpPut request = new HttpPut(url.toString());
+        request.setEntity(new StringEntity(requestBody, "UTF-8"));
+        request.setHeader("Content-Type", "application/json; charset=UTF-8");
+
+        client.execute(request);
+    }
     public static void delete(String endpoint) throws IOException {
         URL url = new URL(API_URL + endpoint);
         HttpDelete request = new HttpDelete(url.toString());
