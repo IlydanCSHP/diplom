@@ -17,6 +17,8 @@ public class MainController {
     MenuItem teachers;
     @FXML
     MenuItem subjects;
+    @FXML
+    MenuItem rooms;
     FXMLLoader loader;
 
     @FXML
@@ -24,6 +26,7 @@ public class MainController {
         groups.setOnAction(event -> openDirectory(new GroupController()));
         teachers.setOnAction(event -> openDirectory(new TeacherController()));
         subjects.setOnAction(event -> openDirectory(new SubjectController()));
+        rooms.setOnAction(event -> openDirectory(new RoomController()));
     }
 
     private <T> void openDirectory(T controller) {
