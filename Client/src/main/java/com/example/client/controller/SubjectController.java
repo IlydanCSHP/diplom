@@ -3,6 +3,8 @@ package com.example.client.controller;
 import com.example.client.Main;
 import com.example.client.RestClient;
 import com.example.client.model.Group;
+import com.example.client.model.Subject;
+import com.example.client.model.Teacher;
 import com.fasterxml.jackson.core.type.TypeReference;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -18,18 +20,18 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.util.List;
 
-public class GroupController {
+public class SubjectController {
     @FXML
     MenuItem main;
     @FXML
-    TableView<Group> table;
+    TableView<Subject> table;
     @FXML
     Button addButton;
     @FXML
     Button updateButton;
     @FXML
     Button deleteButton;
-    ObservableList<Group> groups;
+    ObservableList<Subject> subjects;
     FXMLLoader loader;
 
     @FXML
@@ -37,7 +39,7 @@ public class GroupController {
         main.setOnAction(event -> openMain());
         addButton.setOnAction(event -> addDialog());
         updateButton.setOnAction(event -> updateDialog());
-        deleteButton.setOnAction(event -> deleteGroup());
+        deleteButton.setOnAction(event -> deleteSubject());
         setTable();
     }
 
@@ -62,15 +64,13 @@ public class GroupController {
         try {
             Scene scene = new Scene(loader.load());
             TextField title = new TextField();
-            TextField speciality = new TextField();
 
             title.setPromptText("Название");
-            speciality.setPromptText("Специальность");
 
-            DialogController dialogController = setDialogController(loader, "Добавление группы", title, speciality);
+            DialogController dialogController = setDialogController(loader, "Добавление предмета", title);
 
             Button applyButton = dialogController.getApplyButton();
-            applyButton.setOnAction(event -> addGroup(title, speciality));
+            applyButton.setOnAction(event -> addSubject(title));
 
             setDialog(scene);
         } catch (IOException e) {
@@ -80,22 +80,20 @@ public class GroupController {
 
     private void updateDialog() {
         loader = new FXMLLoader(Main.class.getResource("dialog-view.fxml"));
-        Group group = table.getSelectionModel().getSelectedItem();
+        Subject subject = table.getSelectionModel().getSelectedItem();
         try {
             Scene scene = new Scene(loader.load());
+
             TextField title = new TextField();
-            TextField speciality = new TextField();
 
             title.setPromptText("Название");
-            title.setText(group.getTitle());
+            title.setText(subject.getTitle());
 
-            speciality.setPromptText("Специальность");
-            speciality.setText(group.getSpeciality());
-
-            DialogController dialogController = setDialogController(loader, "Обновление группы", title, speciality);
+            DialogController dialogController = setDialogController(loader, "Обновление предмета", title);
 
             Button applyButton = dialogController.getApplyButton();
-            applyButton.setOnAction(event -> updateGroup(title, speciality, group.getId()));
+
+            applyButton.setOnAction(event -> updateSubject(title, subject.getId()));
 
             setDialog(scene);
         } catch (IOException e) {
@@ -103,16 +101,16 @@ public class GroupController {
         }
     }
 
-    private List<Group> getGroups() throws IOException {
-        return RestClient.get("/groups", new TypeReference<>() {
+    private List<Subject> getSubjects() throws IOException {
+        return RestClient.get("/subjects", new TypeReference<>() {
         });
     }
 
-    private void addGroup(TextField title, TextField speciality) {
+    private void addSubject(TextField title) {
+        Subject subject = new Subject(title.getText());
         new Thread(() -> {
             try {
-                Group group = new Group(title.getText(), speciality.getText());
-                RestClient.add("/groups/add", group);
+                RestClient.add("/subjects/add", subject);
                 setTable();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -120,23 +118,24 @@ public class GroupController {
         }).start();
     }
 
-    private void updateGroup(TextField title, TextField speciality, Long id) {
+    private void updateSubject(TextField title, Long id) {
+        Subject subject = new Subject(title.getText());
         new Thread(() -> {
             try {
-                Group group = new Group(title.getText(), speciality.getText());
-                RestClient.update("/groups/" + id, group);
+                RestClient.update("/subjects/" + id, subject);
                 setTable();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
         }).start();
     }
 
-    private void deleteGroup() {
+    private void deleteSubject() {
+        Subject subject = table.getSelectionModel().getSelectedItem();
         new Thread(() -> {
             try {
-                Group group = table.getSelectionModel().getSelectedItem();
-                RestClient.delete("/groups/" + group.getId());
+                RestClient.delete("/subjects/" + subject.getId());
                 setTable();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -147,16 +146,12 @@ public class GroupController {
     private void setTable() {
         Platform.runLater(() -> {
             try {
-                groups = FXCollections.observableArrayList(getGroups());
-                TableColumn<Group, String> title = new TableColumn<>("Название");
+                subjects = FXCollections.observableArrayList(getSubjects());
+                TableColumn<Subject, String> title = new TableColumn<>("Название");
                 title.setCellValueFactory(new PropertyValueFactory<>("title"));
 
-                TableColumn<Group, String> speciality = new TableColumn<>("Специальность");
-                speciality.setCellValueFactory(new PropertyValueFactory<>("speciality"));
-
-
-                table.setItems(groups);
-                table.getColumns().setAll(title, speciality);
+                table.setItems(subjects);
+                table.getColumns().setAll(title);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
